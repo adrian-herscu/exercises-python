@@ -1,15 +1,27 @@
 from dataclasses import dataclass
-from typing import Iterator, Self
+from typing import Iterable, Iterator, Self, Set, Type
 
 
 class LinkedList[T]:
     @dataclass
     class Node:
         value: T
-        next: 'LinkedList[T].Node | None' = None
+        next: 'LinkedList.Node | None' = None
 
-    head: Node | None = None
-    tail: Node | None = None
+    head: 'Node | None'
+    tail: 'Node | None'
+
+    def __init__(self) -> None:
+        self.tail = self.head = None
+
+    @classmethod
+    def from_iterable(
+            cls: Type['LinkedList[T]'],
+            values: Iterable[T]) -> 'LinkedList[T]':
+        linked_list: LinkedList[T] = cls()
+        for v in values:
+            linked_list.add(v)
+        return linked_list
 
     @property
     def is_empty(self) -> bool:
@@ -49,8 +61,27 @@ class LinkedList[T]:
 
         return self
 
+    def dedup(self) -> Self:
+        seen: Set[T] = set()
+        previous = None
+        current = self.head
+
+        while current:
+            if current.value in seen:
+                if previous:
+                    previous.next = current.next
+                    if current is self.tail:
+                        self.tail = previous
+                current = current.next
+            else:
+                seen.add(current.value)
+                previous = current
+                current = current.next
+
+        return self
+
     @property
-    def _nodes(self) -> Iterator[tuple[Node | None, Node]]:
+    def nodes(self) -> Iterator[tuple['Node | None', 'Node']]:
         previous = None
         current = self.head
         while current:

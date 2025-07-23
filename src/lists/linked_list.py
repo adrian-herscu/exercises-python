@@ -11,19 +11,54 @@ class LinkedList[T]:
     head: Node | None = None
     tail: Node | None = None
 
-    def add_tail(self, value: T) -> Self:
+    @property
+    def is_empty(self) -> bool:
+        return self.tail is None and self.head is None
+
+    def add(self, value: T) -> Self:
         new_tail = self.Node(value)
-        if self.tail is None:  # and self.head is None breaks type checking for self.tail.next below
+        if self.is_empty:
             self.head = self.tail = new_tail
         else:
-            self.tail.next = new_tail
+            self.tail.next = new_tail  # type: ignore
             self.tail = new_tail
         return self
 
-    # def delete_first[T](self, value: T):
+    def delete(self, value: T, first_only: bool = False) -> Self:
+        previous = None
+        current = self.head
+
+        while current:
+            if current.value == value:
+                next_node = current.next  # Save before unlinking
+
+                if previous is None:
+                    self.head = next_node
+                else:
+                    previous.next = next_node
+
+                if current is self.tail:
+                    self.tail = previous
+
+                current = next_node  # Move forward after deletion
+
+                if first_only:
+                    break
+            else:
+                previous, current = current, current.next
+
+        return self
+
+    @property
+    def _nodes(self) -> Iterator[tuple[Node | None, Node]]:
+        previous = None
+        current = self.head
+        while current:
+            yield (previous, current)
+            previous, current = current, current.next
 
     def __iter__(self) -> Iterator[T]:
         current = self.head
-        while current is not None:
+        while current:
             yield current.value
             current = current.next

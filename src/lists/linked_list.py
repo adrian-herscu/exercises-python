@@ -20,14 +20,14 @@ class LinkedList[T]:
             values: Iterable[T]) -> 'LinkedList[T]':
         linked_list: LinkedList[T] = cls()
         for v in values:
-            linked_list.add(v)
+            linked_list.add_tail(v)
         return linked_list
 
     @property
     def is_empty(self) -> bool:
         return self.tail is None and self.head is None
 
-    def add(self, value: T) -> Self:
+    def add_tail(self, value: T) -> Self:
         new_tail = self.Node(value)
         if self.is_empty:
             self.head = self.tail = new_tail
@@ -60,6 +60,20 @@ class LinkedList[T]:
                 previous, current = current, current.next
 
         return self
+
+    def nth_to_last(self, n: int) -> T | None:
+        fast = slow = self.head
+
+        for _ in range(n):
+            if fast is None:
+                return None  # List is shorter than n
+            fast = fast.next
+
+        while fast:
+            fast = fast.next
+            slow = slow.next  # type: ignore
+
+        return slow.value if slow else None
 
     def dedup(self) -> Self:
         seen: Set[T] = set()

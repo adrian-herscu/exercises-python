@@ -12,13 +12,12 @@ class LinkedList[T]:
     tail: Node | None = None
 
     def add_tail(self, value: T) -> Self:
-        new_node = self.Node(value)
-        if self.head is None:
-            self.head = self.tail = new_node
+        tail = self.Node(value)
+        if self.tail is None:
+            self.head = self.tail = tail
         else:
-            assert self.tail is not None
-            self.tail.next = new_node
-            self.tail = new_node
+            self.tail.next = tail
+            self.tail = tail
         return self
 
     # def delete_first[T](self, value: T):
